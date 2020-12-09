@@ -1,0 +1,54 @@
+{% extends 'core/no_carousel.html' %}
+{% load hitcount_tags %}
+
+    {% block content %}
+        <div class="post-list-item">
+            <img class="blog-img" src="{{ post.image.url }}"/>
+            <div class="post-content">
+                <h1>{{ post.title }}</h1>
+                {% if post.published_date %}
+                <p>                
+                <small>
+                    {{ post.published_date|date:'d F, Y' }} |
+                    By {{ post.author }} |
+                    Reads: {% get_hit_count for post %}
+                </small></p>
+                {% else %}
+                    {% if user.is_superuser %}
+                <a class="link-button" href="{% url 'blog:publish' post.id %}">Publish</a>
+                    {% endif %}
+                {% endif %}
+                {% if user.is_superuser %}
+                <a class="link-button" href="{% url 'blog:edit' post.id %}">Edit</a>
+                <a class="link-button" href="{% url 'blog:remove' post.id %}">Delete</a>
+                {% endif %}
+                <p>{{ post.text }}</p>
+            </div>
+        </div>
+        <div id="comments">
+            <h3>Comments</h3>
+            {% if user.is_authenticated %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Submit">
+            </form>
+            {% else %}
+            <p>Please log in or sign up to comment</p>
+            {% endif %}
+            {% for comment in comments %}
+            <div class="comment">
+                <a href="{% url 'user_profile:profile_view' pk=comment.author.pk %}">
+                    <img class="comment-user" src='/media/{{ comment.author.profile.profile_picture }}'/>
+                </a>
+                <small>
+                    <bold>{{ comment.author }}</bold> | 
+                    {{ comment.created_date }}
+                </small>
+                <p>{{ comment.comment }}</p>
+            </div>
+            {% empty %}
+            <p>There are no comments</p>
+            {% endfor %}
+        </div>
+    {% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'core/no_carousel.html' %}
+{% load bootstrap4 %}
+
+    {% block content %}
+        {% if user.is_superuser %}
+        <div class="row">
+            <div class="col-70 left">
+                <form role="form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="submit" value="Post" class="btn btn-secondary">
+                </form>
+            </div>
+            <div class="col-30 right">
+                <h3>Drafts</h3>
+                {% for post in post_list %}
+                <div class="admin-item">
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.text }}</p>
+                    <a href="{% url 'blog:detail' post.id %}" class="more-button">Read more</a>
+                </div>
+                {% empty %}
+                <p>No drafts are available.</p>
+                {% endfor %}
+
+                {% if page_obj.has_other_pages %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><a>&laquo;</a></li>
+                    {% endif %}
+                    {% for x in page_obj.paginator.page_range %}
+                        {% if x == page_obj.number %}
+                    <li class="page-item active"><a>{{ x }}</a></li>
+                        {% else %}
+                    <li class="page-item"><a href="?page={{ x }}">{{ x }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><a>&raquo;</a></li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+                <h3>Contacts</h3>
+                {% for post in contacts %}
+                <div class="admin-item">
+                    {{ post.email }}
+                    <p>{{ post.message }}</p>
+                </div>
+                {% empty %}
+                <p>No drafts are available.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <p>You are not authorized to view this page</p>
+        {% endif %}
+    {% endblock %}

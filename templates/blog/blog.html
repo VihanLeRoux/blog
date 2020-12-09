@@ -1,0 +1,62 @@
+{% extends 'core/no_carousel.html' %}
+{% load hitcount_tags %}
+
+    {% block content %}
+        <div class="row">
+            <div class="col-70 left">
+                <h1>Recently posted</h1></br>
+                {% for post in page_obj %}
+                <div class="post-list-item">
+                    <img class="blog-img" src="{{ post.image.url }}"/>
+                    <div class="post-content">
+                        <h3>{{ post.title }}</h3>
+                        <small>
+                            {{ post.published_date|date:'d F, Y' }} |
+                            By {{ post.author }} |
+                            Reads: {% get_hit_count for post %}
+                        </small>
+                        <br/><br/>
+                        <p>{{ post.text|truncatechars:200 }}</p>
+                        <a href="{% url 'blog:detail' post.id %}" class="link-button">Read more</a>
+                        <a href="{% url 'blog:detail' post.id %}#comments" class="link-button">Comment</a>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No posts are available.</p>
+                {% endfor %}
+
+                {% if page_obj.has_other_pages %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><a>&laquo;</a></li>
+                    {% endif %}
+                    {% for x in page_obj.paginator.page_range %}
+                        {% if x == page_obj.number %}
+                    <li class="page-item active"><a>{{ x }}</a></li>
+                        {% else %}
+                    <li class="page-item"><a href="?page={{ x }}">{{ x }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><a>&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+            </div>
+            <div class="col-30 right">
+                <form action="{% url 'query:query_results' %}">
+                    <input type="text" placeholder="Search..." name="q">
+                    <button type="submit">Search</button>
+                </form>
+                </br>
+                <h4>Top posts</h4>
+                {% for post in top_hits %}
+                <p><a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a></p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endblock %}

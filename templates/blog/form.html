@@ -1,0 +1,16 @@
+{% extends 'core/no_carousel.html' %}
+{% load bootstrap4 %}
+
+    {% block content %}
+        {% if user.is_superuser %}
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+        <form role="form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form layout=layout %}
+            <input type="submit" value="Post" class="btn btn-secondary">
+        </form>
+        {% else %}
+        <p>You are not authorized to view this page</p>
+        {% endif %}
+    {% endblock %}
